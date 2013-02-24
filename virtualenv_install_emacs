@@ -9,6 +9,7 @@
 
 from __future__ import print_function
 import os, stat, sys, argparse, subprocess
+from pkg_resources import resource_filename
 
 class EmacsEnv(object):
 
@@ -113,8 +114,7 @@ $EMACS --eval "(let ((package-user-dir \\"$USERDIR\\")) (package-refresh-content
         subprocess.check_call(args)
 
 def _get_lisp_file(filename):
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                        "lisp", filename))
+    path = resource_filename(__name__, 'lisp/%s' % (filename))
     return path
 
 def _get_cli_parser():
