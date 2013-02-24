@@ -26,6 +26,11 @@ class EmacsEnv(object):
 (defconst package-subdirectory-regexp
               "\\\\([^.].*?\\\\)-\\\\([0-9]+\\\\(?:[.][0-9]+\\\\|\\\\(?:pre\\\\|beta\\\\|alpha\\\\)[0-9]+\\\\)*\\\\)"
   )
+
+(defalias 'condition-case-unless-debug 'condition-case)
+
+(when (require 'package nil t)
+  (package-initialize))
 """
               % (self._site_lisp), file=open(self._site_start, "w"))
 
