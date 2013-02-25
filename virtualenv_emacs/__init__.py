@@ -61,7 +61,7 @@ USERDIR="$VIRTUAL_ENV/share/site-lisp/elpa"
 INSTALLS=""
 
 for package in "$@"; do
-  INSTALLS="$INSTALLS (package-install (intern \\"$package\\"))"
+  INSTALLS="$INSTALLS (unless (package-installed-p (intern \\"$package\\")) (package-install (intern \\"$package\\")))"
 done
 
 $EMACS --eval "(let ((package-user-dir \\"$USERDIR\\")) (package-refresh-contents) $INSTALLS)"
