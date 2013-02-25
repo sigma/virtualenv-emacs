@@ -51,6 +51,11 @@ exec %s -l "%s" "$@"
 
     def create_elpa_get(self):
         print("""#!/bin/bash
+if [ -z "$VIRTUAL_ENV" ]; then
+  # try the original path... granted, that's not relocation-friendly
+  VIRTUAL_ENV="%s"
+fi
+
 EMACS="$VIRTUAL_ENV/bin/emacs --batch"
 USERDIR="$VIRTUAL_ENV/share/site-lisp/elpa"
 INSTALLS=""
@@ -61,7 +66,7 @@ done
 
 $EMACS --eval "(let ((package-user-dir \\"$USERDIR\\")) (package-refresh-contents) $INSTALLS)"
 
-""",
+""" % (self._venv),
               file=open(self._elpa_get, "w"))
 
         st = os.stat(self._elpa_get)
