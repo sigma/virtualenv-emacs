@@ -6,6 +6,11 @@ def _get_lisp_file(filename):
     path = resource_filename(__name__, 'lisp/%s' % (filename))
     return path
 
+
+def find_executable(program):
+    return subprocess.check_output(['which', program]).strip()
+
+
 class EmacsEnv(object):
 
     def __init__(self, emacs, venv, package_sources=[]):
@@ -17,6 +22,17 @@ class EmacsEnv(object):
         self._vemacs = os.path.join(self._venv, "bin", "emacs")
         self._elpa_get = os.path.join(self._venv, "bin", "elpa-get")
         self._sources = package_sources
+
+    def check_emacs(self):
+        """
+        Check that :attr:`_emacs` is a full-path and executable.
+        """
+        if os.path.sep not in self._emacs:
+            self._emacs = find_executable(self._emacs)
+        elif not os.path.isabs(self._emacs):
+            self._emacs = os.path.abspath(self._emacs)
+        if not os.access(self._emacs, os.X_OK):
+            raise ValueError('{0} is not executable'.format(self._emacs))
 
     def create_site_start(self):
         script = """(add-to-list 'load-path "%s")
@@ -41,6 +57,7 @@ class EmacsEnv(object):
         print(script, file=open(self._site_start, "w"))
 
     def create_emacs(self):
+        self.check_emacs()
         print("""#!/bin/bash
 exec %s -l "%s" "$@"
 """ % (self._emacs, self._site_start),
