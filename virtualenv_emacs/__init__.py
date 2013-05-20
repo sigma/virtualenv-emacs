@@ -51,11 +51,7 @@ exec %s -l "%s" "$@"
 
     def create_elpa_get(self):
         print("""#!/bin/bash
-if [ -z "$VIRTUAL_ENV" ]; then
-  # try the original path... granted, that's not relocation-friendly
-  VIRTUAL_ENV="%s"
-fi
-
+VIRTUAL_ENV="%s"
 EMACS="$VIRTUAL_ENV/bin/emacs --batch"
 USERDIR="$VIRTUAL_ENV/share/site-lisp/elpa"
 INSTALLS=""
