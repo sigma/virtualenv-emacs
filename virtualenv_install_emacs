@@ -7,6 +7,7 @@ from virtualenv_emacs import EmacsEnv
 def _get_cli_parser():
     formatter = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(formatter_class=formatter)
+    parser.add_argument('--reinstall', action='store_true')
     parser.add_argument('--with-env', type=str, default="",
                         dest='env', metavar='ENV', help='target virtualenv')
     parser.add_argument('--with-emacs', type=str, default="/usr/bin/emacs",
@@ -18,6 +19,12 @@ def _get_cli_parser():
 if __name__ == '__main__':
     parser = _get_cli_parser()
     args = parser.parse_args()
+
+    emacspath = os.path.join(os.path.dirname(__file__), 'emacs')
+    if not args.reinstall and os.path.exists(emacspath):
+        print("{0} already exists.  Use --reinstall to force reinstallation."
+              .format(emacspath), file=sys.stderr)
+        exit(0)
 
     venv = args.env
     if not venv:
