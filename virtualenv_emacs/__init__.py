@@ -11,7 +11,7 @@ class EmacsEnv(object):
     def __init__(self, emacs, venv, package_sources=[]):
         self._emacs = emacs
         self._venv = venv
-        self._site_lisp = os.path.join(self._venv, "share", "site-lisp")
+        self._site_lisp = os.path.join(self._venv, "share", "site-lisp", "")
         self._elpa = os.path.join(self._site_lisp, "elpa")
         self._site_start = os.path.join(self._site_lisp, "site-start.el")
         self._vemacs = os.path.join(self._venv, "bin", "emacs")
@@ -19,7 +19,9 @@ class EmacsEnv(object):
         self._sources = package_sources
 
     def create_site_start(self):
-        script = """(add-to-list 'load-path "%s")
+        script = """\
+(defconst virtualenv-site-lisp "%s")
+(add-to-list 'load-path virtualenv-site-lisp)
 
 (defconst package-subdirectory-regexp
               "\\\\([^.].*?\\\\)-\\\\([0-9]+\\\\(?:[.][0-9]+\\\\|\\\\(?:pre\\\\|beta\\\\|alpha\\\\)[0-9]+\\\\)*\\\\)"
@@ -49,29 +51,6 @@ exec %s -l "%s" "$@"
         st = os.stat(self._vemacs)
         os.chmod(self._vemacs, st.st_mode | stat.S_IEXEC)
 
-    def create_elpa_get(self):
-        print("""#!/bin/bash
-if [ -z "$VIRTUAL_ENV" ]; then
-  # try the original path... granted, that's not relocation-friendly
-  VIRTUAL_ENV="%s"
-fi
-
-EMACS="$VIRTUAL_ENV/bin/emacs --batch"
-USERDIR="$VIRTUAL_ENV/share/site-lisp/elpa"
-INSTALLS=""
-
-for package in "$@"; do
-  INSTALLS="$INSTALLS (unless (package-installed-p (intern \\"$package\\")) (package-install (intern \\"$package\\")))"
-done
-
-$EMACS --eval "(let ((package-user-dir \\"$USERDIR\\")) (package-refresh-contents) $INSTALLS)"
-
-""" % (self._venv),
-              file=open(self._elpa_get, "w"))
-
-        st = os.stat(self._elpa_get)
-        os.chmod(self._elpa_get, st.st_mode | stat.S_IEXEC)
-
     def install(self):
         # create required directories
         try:
@@ -84,9 +63,6 @@ $EMACS --eval "(let ((package-user-dir \\"$USERDIR\\")) (package-refresh-content
 
         # install emacs script
         self.create_emacs()
-
-        # install elpa-get script
-        self.create_elpa_get()
 
         try:
             # do we need to bootstrap package ?
@@ -112,3 +88,17 @@ $EMACS --eval "(let ((package-user-dir \\"$USERDIR\\")) (package-refresh-content
     def _run_emacs(self, *args):
         args = [self._vemacs, "--batch"] + list(args)
         subprocess.check_call(args)
+
+
+def launch_elpa_get(args=None):
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('package', nargs='+')
+    ns = parser.parse_args(args)
+
+    packages = ' '.join(ns.package)
+    set_packages = "(setq elpa-get-packages '({0}))".format(packages)
+    subprocess.check_call(
+        ['emacs', '-Q', '--batch',
+         '--eval', set_packages,
+         '-l', _get_lisp_file('elpa-get.el')])
