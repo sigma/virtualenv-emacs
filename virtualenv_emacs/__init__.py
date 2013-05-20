@@ -11,7 +11,7 @@ class EmacsEnv(object):
     def __init__(self, emacs, venv, package_sources=[]):
         self._emacs = emacs
         self._venv = venv
-        self._site_lisp = os.path.join(self._venv, "share", "site-lisp", "")
+        self._site_lisp = os.path.join(self._venv, "share", "site-lisp")
         self._elpa = os.path.join(self._site_lisp, "elpa")
         self._site_start = os.path.join(self._site_lisp, "site-start.el")
         self._vemacs = os.path.join(self._venv, "bin", "emacs")

@@ -1,4 +1,5 @@
-(let ((package-user-dir (concat virtualenv-site-lisp "elpa"))
+(let ((package-user-dir
+       (concat (file-name-as-directory virtualenv-site-lisp) "elpa"))
       need-install)
   (mapcar (lambda (pak) (unless (package-installed-p pak)
                           (push pak need-install)))
