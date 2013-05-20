@@ -94,11 +94,15 @@ def launch_elpa_get(args=None):
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('package', nargs='+')
+    parser.add_argument('--reinstall', action='store_true')
     ns = parser.parse_args(args)
 
     packages = ' '.join(ns.package)
+    reinstall = 't' if ns.reinstall else 'nil'
     set_packages = "(setq elpa-get-packages '({0}))".format(packages)
+    set_reinstall = '(setq elpa-get-reinstall {0})'.format(reinstall)
     subprocess.check_call(
         ['emacs', '-Q', '--batch',
+         '--eval', set_reinstall,
          '--eval', set_packages,
          '-l', _get_lisp_file('elpa-get.el')])
