@@ -1,4 +1,5 @@
 from __future__ import print_function
+import argparse
 import os, stat, sys, subprocess
 from pkg_resources import resource_filename
 
@@ -91,7 +92,6 @@ exec %s -l "%s" "$@"
 
 
 def launch_elpa_get(args=None):
-    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('package', nargs='+')
     parser.add_argument('--reinstall', action='store_true')
@@ -106,3 +106,18 @@ def launch_elpa_get(args=None):
          '--eval', set_reinstall,
          '--eval', set_packages,
          '-l', _get_lisp_file('elpa-get.el')])
+
+
+def launch_package_install_file(args=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('package', metavar='EL_OR_TAR', nargs='+')
+    ns = parser.parse_args(args)
+
+    packages = ' '.join(map('"{0}"'.format, ns.package))
+    lisp = """
+    (let ((package-user-dir
+           (concat (file-name-as-directory virtualenv-site-lisp) "elpa")))
+      (package-refresh-contents)
+      (mapcar #'package-install-file '({0})))
+    """.format(packages)
+    subprocess.check_call(['emacs', '-Q', '--batch', '--eval', lisp])
