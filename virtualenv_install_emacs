@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     sources = []
     if args.marmalade:
-        sources.append(("marmalade", "http://marmalade-repo.org/packages/"))
+        sources.append(("marmalade", "https://marmalade-repo.org/packages/"))
     if args.melpa:
         sources.append(("melpa", "http://melpa.milkbox.net/packages/"))
 
