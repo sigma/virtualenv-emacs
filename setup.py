@@ -7,7 +7,7 @@ setup(name="virtualenv-emacs",
       description=('Helper to injecting a custom version of emacs '
                    'with package.el enabled into an existing virtualenv'),
       url='http://github.com/sigma/virtualenv-emacs',
-      scripts=['virtualenv_install_emacs',],
+      scripts=['virtualenv_install_emacs', 'elpa-get'],
       packages=['virtualenv_emacs'],
       package_data={'virtualenv_emacs': ['lisp/*.el']},
       include_package_data=True,
