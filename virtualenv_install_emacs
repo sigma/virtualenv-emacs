@@ -9,7 +9,8 @@ def _get_cli_parser():
     parser = argparse.ArgumentParser(formatter_class=formatter)
     parser.add_argument('--with-env', type=str, default="",
                         dest='env', metavar='ENV', help='target virtualenv')
-    parser.add_argument('--with-emacs', type=str, default="/usr/bin/emacs",
+    parser.add_argument('--with-emacs', type=str,
+                        default=os.environ.get('EMACS', "/usr/bin/emacs"),
                         dest='emacs', metavar='EMACS', help='emacs program')
     parser.add_argument("--marmalade", action="store_true")
     parser.add_argument("--melpa", action="store_true")
